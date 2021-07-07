@@ -9,7 +9,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/prometheus/client_golang/prometheus/m3/prompb"
 )
 
 var writeRequestFixture = &prompb.WriteRequest{
@@ -75,11 +75,10 @@ func ExampleRemoteWriteMetadata() {
 	if err != nil {
 		fmt.Printf("http NewRequest error: %v\n", err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	_, err = http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Printf("http defaultClient  do error: %v\n", err)
 	}
-	fmt.Println(resp)
 	//output:
 }
 

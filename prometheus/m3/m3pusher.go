@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/m3/prompb"
 	dto "github.com/prometheus/client_model/go"
-	"github.com/prometheus/prometheus/prompb"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -226,6 +226,7 @@ func returnTimeSeriesFunc(mf *dto.MetricFamily) getTimeSeries {
 			}}
 
 		}
+	//todo 如果是整数，quantile现在显示的是0.00，能否修改掉这个问题
 	case dto.MetricType_SUMMARY:
 		return func(labels []prompb.Label, metric *dto.Metric, timestamp int64) []prompb.TimeSeries {
 			summary := metric.GetSummary()

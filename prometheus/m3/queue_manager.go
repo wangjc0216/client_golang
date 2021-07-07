@@ -3,7 +3,7 @@ package m3
 import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
-	"github.com/prometheus/prometheus/prompb"
+	"github.com/prometheus/client_golang/prometheus/m3/prompb"
 )
 
 func buildWriteRequest(samples []prompb.TimeSeries, metadata []prompb.MetricMetadata, buf []byte) ([]byte, int64, error) {
