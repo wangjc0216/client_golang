@@ -30,22 +30,28 @@ type Collector interface {
 	// the last descriptor has been sent. The sent descriptors fulfill the
 	// consistency and uniqueness requirements described in the Desc
 	// documentation.
-	//
+	//Describe方法发送这个Collector采集上来的super-set
+
 	// It is valid if one and the same Collector sends duplicate
 	// descriptors. Those duplicates are simply ignored. However, two
 	// different Collectors must not send duplicate descriptors.
-	//
+	//相同的/同一个Collector发送重复的desc是合法的，但是不同的Collector一定要发送不同的Desc
+
 	// Sending no descriptor at all marks the Collector as “unchecked”,
 	// i.e. no checks will be performed at registration time, and the
 	// Collector may yield any Metric it sees fit in its Collect method.
-	//
+	//如不发送任何descriptor，则会标记该Collector是unchecked，即在注册时不会执行任何检查，
+	//并且Collect方法可以产生任何它任何适合其Collect方法的Metric
+
 	// This method idempotently sends the same descriptors throughout the
 	// lifetime of the Collector. It may be called concurrently and
 	// therefore must be implemented in a concurrency safe way.
-	//
+	//这个方法是幂等的，所以一定要并发实现
+
 	// If a Collector encounters an error while executing this method, it
 	// must send an invalid descriptor (created with NewInvalidDesc) to
 	// signal the error to the registry.
+	//如果Collector遇到错误，可以返回一个invalid descriptor来告诉registry这个错误
 	Describe(chan<- *Desc)
 	// Collect is called by the Prometheus registry when collecting
 	// metrics. The implementation sends each collected metric via the
@@ -54,11 +60,15 @@ type Collector interface {
 	// (unless the Collector is unchecked, see above). Returned metrics that
 	// share the same descriptor must differ in their variable label
 	// values.
-	//
+	//每一个Metric的descriptor一定是Describe方法中返回的Desc（除非Collector是unchecked，见Describe）
+	//返回的metric如果共享同一个descriptor，则它们的variable label一定不同。
+
 	// This method may be called concurrently and must therefore be
 	// implemented in a concurrency safe way. Blocking occurs at the expense
 	// of total performance of rendering all registered metrics. Ideally,
 	// Collector implementations support concurrent readers.
+	//这个方法可能会并发调用，因此实现一定要并发安全(如同时调用metric接口)。
+	//阻塞的发生会以所有注册的指标呈现的性能为代价。 理想情况下，Collector实现支持并发读取
 	Collect(chan<- Metric)
 }
 
