@@ -32,16 +32,19 @@ import (
 // included in this package manage their Desc under the hood. Users only have to
 // deal with Desc if they use advanced features like the ExpvarCollector or
 // custom Collectors and Metrics.
-//
+//Desc是每个Metric的descriptor。它是Metric中不可变的metadata。此包中一般的Metric实现都是在引擎盖下(under the hood)管理他们的Desc。
+//用户如果想使用高级的特性，如ExpvarCollector或自定义Collector,metric,他们需要处理Desc。
+
 // Descriptors registered with the same registry have to fulfill certain
 // consistency and uniqueness criteria if they share the same fully-qualified
 // name: They must have the same help string and the same label names (aka label
 // dimensions) in each, constLabels and variableLabels, but they must differ in
 // the values of the constLabels.
-//
+//在registry注册的Desc一定要满足一致性和唯一性的规范，如果他们共享fully-qualified的name(有相同的help、label names(aka label dimensions)、constLables in the values of the constLabels)
+
 // Descriptors that share the same fully-qualified names and the same label
 // values of their constLabels are considered equal.
-//
+//fully-qualified name相同和constlabel值相同的描述符被认为是相等的。
 // Use NewDesc to create new Desc instances.
 type Desc struct {
 	// fqName has been built from Namespace, Subsystem, and Name.
@@ -70,12 +73,15 @@ type Desc struct {
 // NewDesc allocates and initializes a new Desc. Errors are recorded in the Desc
 // and will be reported on registration time. variableLabels and constLabels can
 // be nil if no such labels should be set. fqName must not be empty.
-//
+//NewDesc()分配和实例化一个Desc，Errors会被放在Desc中，当register时会上报上去。
+
 // variableLabels only contain the label names. Their label values are variable
 // and therefore not part of the Desc. (They are managed within the Metric.)
-//
+//variableLables 仅包含label name，label values是变量因此不是Desc的一部分（label values被Metric管理）
+
 // For constLabels, the label values are constant. Therefore, they are fully
 // specified in the Desc. See the Collector example for a usage pattern.
+//对于constLabels，因为value也是constant，所以他们保存在Desc
 func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *Desc {
 	d := &Desc{
 		fqName:         fqName,
@@ -162,6 +168,7 @@ func NewDesc(fqName, help string, variableLabels []string, constLabels Labels) *
 // provided error set. If a collector returning such a descriptor is registered,
 // registration will fail with the provided error. NewInvalidDesc can be used by
 // a Collector to signal inability to describe itself.
+//NewInvalidDesc被Collector使用来标记自己无法describe itself，是返回一个invalid Desc,包含error
 func NewInvalidDesc(err error) *Desc {
 	return &Desc{
 		err: err,
