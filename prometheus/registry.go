@@ -138,6 +138,7 @@ type Registerer interface {
 // the collected metrics into a number of MetricFamilies. The Gatherer interface
 // comes with the same general implication as described for the Registerer
 // interface.
+//Gatherer是registry的一部分接口，负责采集Metric到MetricFamilies.Gatherer接口与Registerer接口具有相同的一般含义。
 type Gatherer interface {
 	// Gather calls the Collect method of the registered Collectors and then
 	// gathers the collected metrics into a lexicographically sorted slice
@@ -146,7 +147,10 @@ type Gatherer interface {
 	// for valid exposition. As an exception to the strict consistency
 	// requirements described for metric.Desc, Gather will tolerate
 	// different sets of label names for metrics of the same metric family.
-	//
+	//Gather 调用注册的Collectors的Collect方法将Metric采集到字典排序的唯一命名的MetricFamily的slice。
+	//Gather 确保是返回的slice是合法的自相一致的以便它可以合法的暴露。
+	//作为针对 metric.Desc 描述的严格一致性要求的一个例外，Gather 将容忍同一度量系列的度量的不同标签名称集
+
 	// Even if an error occurs, Gather attempts to gather as many metrics as
 	// possible. Hence, if a non-nil error is returned, the returned
 	// MetricFamily slice could be nil (in case of a fatal error that
@@ -158,6 +162,8 @@ type Gatherer interface {
 	// exposition in actual monitoring, it is almost always better to not
 	// expose an incomplete result and instead disregard the returned
 	// MetricFamily protobufs in case the returned error is non-nil.
+	//即使发生错误，Gather也会尽可能采集指标。所以当一个错误发生时，slice可能为nil（如果是致命错误，阻止了任何有意义的metric collection），或者是一些指标是不完整的，甚至一些是丢失的。
+	//返回的错误会解释错误细节，这对debug错误是非常重要的。如果有报错，并返回不完整的Metric，最好丢弃。
 	Gather() ([]*dto.MetricFamily, error)
 }
 
@@ -695,7 +701,9 @@ func processMetric(
 // Gather calls are all returned in a flattened MultiError. Duplicate and
 // inconsistent Metrics are skipped (first occurrence in slice order wins) and
 // reported in the returned error.
-//
+//Gatherers是Gatherer实例的slice，它的Gather方法是调用每个Gatherer的Gather方法并合并结果，同时会将错误返回成flattened MultiError。
+//重复和不一致的Metric将会被跳过。
+
 // Gatherers can be used to merge the Gather results from multiple
 // Registries. It also provides a way to directly inject existing MetricFamily
 // protobufs into the gathering by creating a custom Gatherer with a Gather
@@ -705,6 +713,8 @@ func processMetric(
 // the gathered MetricFamilies are reported as errors by the Gather method, and
 // inconsistent Metrics are dropped. Invalid parts of the MetricFamilies
 // (e.g. syntactically invalid metric or label names) will go undetected.
+//Gatherers 可以从多个Registry的Gather结果进行合并。它还提供了一种直接将现有的MetricFamily protobufs直接注入到收集中的方法。
+//如果采集的MetricFamily不一致则会返回错误，并且不一致的Metric将被丢弃。
 type Gatherers []Gatherer
 
 // Gather implements Gatherer.
