@@ -25,7 +25,10 @@ import (
 // for implementations of vectors of a given metric type, like GaugeVec,
 // CounterVec, SummaryVec, and HistogramVec. It is exported so that it can be
 // used for custom Metric implementations.
-//
+//MetricVec是一个绑定相同desc的metrics的Collector。
+//MetricVec不被直接使用而是作为积木(building block)给指定的metric type，如GaugeVec、CounterVec等使用。
+//它被设定为exported是为了自定义的Metric实现。
+
 // To create a FooVec for custom Metric Foo, embed a pointer to MetricVec in
 // FooVec and initialize it with NewMetricVec. Implement wrappers for
 // GetMetricWithLabelValues and GetMetricWith that return (Foo, error) rather

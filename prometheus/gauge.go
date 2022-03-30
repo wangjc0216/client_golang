@@ -131,6 +131,7 @@ func (g *gauge) Write(out *dto.Metric) error {
 // you want to count the same thing partitioned by various dimensions
 // (e.g. number of operations queued, partitioned by user and operation
 // type). Create instances with NewGaugeVec.
+//GaugeVec是一个绑定一组Gauges的Collector，这些Gauge共享同一个Desc，但是有不同的variable label values。
 type GaugeVec struct {
 	*MetricVec
 }
