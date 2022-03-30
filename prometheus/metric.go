@@ -35,6 +35,9 @@ type Metric interface {
 	// Metric. The returned descriptor is immutable by contract. A Metric
 	// unable to describe itself must return an invalid descriptor (created
 	// with NewInvalidDesc).
+	//Desc返回Metric的descriptor。这个方法在Metric的生命周期是幂等的返回相同的descriptor。
+	//by contract按照合同，返回的descriptor是不变的。
+	//如果Metric不能描述它自己，则返回invalid descriptor。
 	Desc() *Desc
 	// Write encodes the Metric into a "Metric" Protocol Buffer data
 	// transmission object.
@@ -44,12 +47,15 @@ type Metric interface {
 	// expense of total performance of rendering all registered
 	// metrics. Ideally, Metric implementations should support concurrent
 	// readers.
-	//
+	//Metric的实现一定是观测并发安全，因为Metric的读取可能发生在任何时候，任何的blocking都会以渲染所有的registered metric性能为代价（对应Collector.Collect）。
+	//理想情况下，Metric的实现应该支持并发读。
+
 	// While populating dto.Metric, it is the responsibility of the
 	// implementation to ensure validity of the Metric protobuf (like valid
 	// UTF-8 strings or syntactically valid metric and label names). It is
 	// recommended to sort labels lexicographically. Callers of Write should
 	// still make sure of sorting if they depend on it.
+	//当填充dto.Metric,Metric实现需要确保Metric protobuf和合法性。推荐按照字典顺序排序，Write的调用者如果需要排序，也要排序下。
 	Write(*dto.Metric) error
 	// TODO(beorn7): The original rationale of passing in a pre-allocated
 	// dto.Metric protobuf to save allocations has disappeared. The
