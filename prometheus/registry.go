@@ -94,13 +94,16 @@ func NewPedanticRegistry() *Registry {
 // Registerer as type for registration purposes (rather than the Registry type
 // directly). In that way, they are free to use custom Registerer implementation
 // (e.g. for testing purposes).
+//Registerer是registry的一部分接口，用于register和unregister
 type Registerer interface {
 	// Register registers a new Collector to be included in metrics
 	// collection. It returns an error if the descriptors provided by the
 	// Collector are invalid or if they — in combination with descriptors of
 	// already registered Collectors — do not fulfill the consistency and
 	// uniqueness criteria described in the documentation of metric.Desc.
-	//
+	//Register注册一个新的Collector来采集该Collector负责的Metric。如果Collector是无效的或者重复注册的，则返回错误。
+	//重复通常是不满足metric.Desc的一致性和唯一性。
+
 	// If the provided Collector is equal to a Collector already registered
 	// (which includes the case of re-registering the same Collector), the
 	// returned error is an instance of AlreadyRegisteredError, which
@@ -124,13 +127,17 @@ type Registerer interface {
 	// returns whether a Collector was unregistered. Note that an unchecked
 	// Collector cannot be unregistered (as its Describe method does not
 	// yield any descriptor).
-	//
+	//Unregister会取消登记传入的Collector(Collector的Describe方法返回相同的descriptor则认为两个Collector相同)
+	//unchecked Collector不能被Unregister,因为它的Describe返回为nil。
+
 	// Note that even after unregistering, it will not be possible to
 	// register a new Collector that is inconsistent with the unregistered
 	// Collector, e.g. a Collector collecting metrics with the same name but
 	// a different help string. The rationale here is that the same registry
 	// instance must only collect consistent metrics throughout its
 	// lifetime.
+	//相同的registry在生命周期内只能采集一致的metrics，所以在一个Collector unregister后，
+	//如果另一个相同名字但是其他不同(如help字段)Collector 重新register，也是不能注册成功的。
 	Unregister(Collector) bool
 }
 
